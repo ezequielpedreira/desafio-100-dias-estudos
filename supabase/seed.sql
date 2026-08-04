@@ -1,0 +1,3 @@
+-- Dados globais já são inseridos de forma idempotente pela migration.
+-- Participantes e sessões fictícios ficam no modo demo da aplicação e nunca são inseridos em produção.
+-- Para testes de integração locais, crie usuários pelo Supabase Auth local e execute os fluxos pelas RPCs.
