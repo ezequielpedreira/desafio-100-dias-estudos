@@ -1,69 +1,16 @@
-import Image from "next/image";
+import Link from "next/link";
+import { ArrowRight, CheckCircle2, Flame, ShieldCheck, Sparkles, TimerReset, Trophy, Zap } from "lucide-react";
+import { BrandMark } from "@/components/brand-mark";
+import { PixelMascot } from "@/components/pixel-mascot";
+import { brand } from "@/lib/brand";
 
-export default function Home() {
-  return (
-    <div className="flex flex-col flex-1 items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex flex-1 w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert h-5 w-[100px]"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the{" "}
-            <code className="rounded bg-black/[.06] px-1.5 py-0.5 font-mono text-[0.9em] dark:bg-white/[.08]">
-              page.tsx
-            </code>{" "}
-            file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
-        </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert h-[14px] w-4"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={14}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
-        </div>
-      </main>
-    </div>
-  );
-}
+export default function Home(){return <main className="min-h-screen overflow-hidden bg-[#f8f7fc] text-[#1d1930]">
+  <nav className="mx-auto flex max-w-6xl items-center justify-between px-5 py-5"><BrandMark/><Link href="/login" className="btn-secondary">Entrar</Link></nav>
+  <section className="pixel-grid relative mx-auto grid max-w-6xl items-center gap-12 rounded-[32px] border border-[#ded9ee] bg-white px-6 py-14 md:grid-cols-[1.15fr_.85fr] md:px-14 md:py-20">
+    <div className="relative z-10"><div className="chip mb-5 bg-[#eeeaff] text-[#6c4cff]"><Sparkles size={14}/> Seu próximo nível começa hoje</div><h1 className="font-display max-w-3xl text-5xl font-black leading-[.98] tracking-[-.055em] md:text-7xl">Estude. Marque presença. <span className="text-[#6c4cff]">Evolua.</span></h1><p className="mt-6 max-w-xl text-lg leading-8 text-[#716b86]">{brand.tagline} Faça seu check-in, mantenha a sequência e transforme esforço em uma jornada que dá gosto de acompanhar.</p><div className="mt-8 flex flex-col gap-3 sm:flex-row"><Link href="/login?mode=signup" className="btn-primary px-6">Começar meu desafio <ArrowRight size={18}/></Link><Link href="/app" className="btn-secondary px-6">Ver demonstração</Link></div><div className="mt-8 flex flex-wrap gap-x-6 gap-y-2 text-sm font-bold text-[#716b86]"><span className="flex items-center gap-2"><CheckCircle2 size={17} className="text-[#27ae76]"/>Grátis para começar</span><span className="flex items-center gap-2"><ShieldCheck size={17} className="text-[#6c4cff]"/>Dados protegidos</span></div></div>
+    <div className="relative mx-auto w-full max-w-sm"><div className="absolute -left-16 top-5 h-28 w-28 rounded-full bg-[#eeeaff] blur-2xl"/><div className="card rotate-[2deg] border-2 border-[#31294e] p-6 shadow-[8px_9px_0_#31294e]"><div className="flex items-center justify-between"><span className="eyebrow">Missão de hoje</span><PixelMascot small/></div><div className="mt-2 font-display text-4xl font-black">Dia 18 <span className="text-lg text-[#716b86]">/ 100</span></div><div className="mt-4 h-3 overflow-hidden rounded-full bg-[#eeeaff]"><div className="h-full w-[18%] rounded-full bg-[#6c4cff]"/></div><div className="mt-6 grid grid-cols-3 gap-2"><MiniStat icon={<Flame size={18}/>} value="6" label="sequência" color="#ff7a45"/><MiniStat icon={<Zap size={18}/>} value="1.485" label="XP" color="#6c4cff"/><MiniStat icon={<Trophy size={18}/>} value="#12" label="ranking" color="#d49400"/></div><button className="btn-primary mt-6 w-full"><TimerReset size={19}/> Fazer check-in</button></div></div>
+  </section>
+  <section className="mx-auto grid max-w-6xl gap-4 px-5 py-16 md:grid-cols-3"><Feature icon={<TimerReset/>} title="Cronômetro confiável" text="Pausa, retoma e continua certo mesmo depois de fechar o navegador."/><Feature icon={<Flame/>} title="Consistência visível" text="Cada dia concluído acende sua trilha e fortalece sua sequência."/><Feature icon={<Trophy/>} title="Progresso que motiva" text="XP, níveis, conquistas e ranking sem transformar estudo em pressão."/></section>
+</main>}
+function MiniStat({icon,value,label,color}:{icon:React.ReactNode;value:string;label:string;color:string}){return <div className="rounded-xl bg-[#f7f6fb] p-3 text-center"><span className="mx-auto mb-1 grid h-7 w-7 place-items-center rounded-lg" style={{color,background:`${color}18`}}>{icon}</span><strong className="block font-display text-sm">{value}</strong><span className="text-[10px] font-bold text-[#716b86]">{label}</span></div>}
+function Feature({icon,title,text}:{icon:React.ReactNode;title:string;text:string}){return <article className="card p-6"><span className="grid h-11 w-11 place-items-center rounded-xl bg-[#eeeaff] text-[#6c4cff]">{icon}</span><h2 className="font-display mt-5 text-xl font-black">{title}</h2><p className="mt-2 leading-7 text-[#716b86]">{text}</p></article>}

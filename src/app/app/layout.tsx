@@ -1,0 +1,1 @@
+import type{Metadata}from"next";import{AppShell}from"@/components/app-shell";export const metadata:Metadata={title:"Minha jornada"};export const dynamic="force-dynamic";export default function DashboardLayout({children}:{children:React.ReactNode}){return <AppShell>{children}</AppShell>}

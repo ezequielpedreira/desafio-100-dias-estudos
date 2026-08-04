@@ -1,0 +1,2 @@
+export const brand = { name:"LevelUp 100", shortName:"L100", tagline:"100 dias para transformar estudo em consistência.", description:"Seu desafio gamificado para estudar com foco, acompanhar a evolução e subir de nível todos os dias.", challengeDays:100, minCompletionMinutes:1, timezone:"America/Sao_Paulo" } as const;
+export const studyCategories = ["Power BI","SQL","Python","Excel","Inglês","Faculdade","Certificação","Leitura","Projeto pessoal","Outro"] as const;
