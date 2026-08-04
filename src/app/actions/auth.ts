@@ -17,5 +17,13 @@ export async function signup(_:AuthState|undefined,formData:FormData):Promise<Au
   const result=parse(formData,true);if(!result.success)return{errors:result.error.flatten().fieldErrors};if(!hasSupabaseEnv)return{message:"Conecte um projeto Supabase para criar a conta."};
   const data=result.data as {name:string;email:string;password:string};const supabase=await createClient();const origin=process.env.NEXT_PUBLIC_SITE_URL??"http://localhost:3000";const {error}=await supabase.auth.signUp({email:data.email,password:data.password,options:{data:{full_name:data.name},emailRedirectTo:`${origin}/auth/callback?next=/onboarding`}});if(error)return{message:error.message.includes("already")?"Este e-mail já possui cadastro.":"Não foi possível criar a conta."};return{message:"Conta criada! Confira seu e-mail para continuar."};
 }
+export async function signInWithGoogle(_:AuthState|undefined,__formData:FormData):Promise<AuthState>{
+  void _;void __formData;
+  if(!hasSupabaseEnv)return{message:"Conecte um projeto Supabase para entrar com Google."};
+  const supabase=await createClient();const origin=process.env.NEXT_PUBLIC_SITE_URL??"http://localhost:3000";
+  const{data,error}=await supabase.auth.signInWithOAuth({provider:"google",options:{redirectTo:`${origin}/auth/callback?next=/onboarding`}});
+  if(error||!data.url)return{message:"Não foi possível iniciar o cadastro com Google."};
+  redirect(data.url);
+}
 export async function requestPasswordReset(_:AuthState|undefined,formData:FormData):Promise<AuthState>{const email=z.email().safeParse(formData.get("email"));if(!email.success)return{message:"Informe um e-mail válido."};if(!hasSupabaseEnv)return{message:"Conecte o Supabase para recuperar a senha."};const supabase=await createClient();const origin=process.env.NEXT_PUBLIC_SITE_URL??"http://localhost:3000";await supabase.auth.resetPasswordForEmail(email.data,{redirectTo:`${origin}/reset-password`});return{message:"Se houver uma conta, enviaremos o link de recuperação."};}
 export async function logout(){if(hasSupabaseEnv){const supabase=await createClient();await supabase.auth.signOut();}redirect("/login");}
