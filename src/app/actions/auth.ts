@@ -9,21 +9,15 @@ const loginSchema=z.object({email:z.email("Informe um e-mail válido.").trim(),p
 const signupSchema=loginSchema.extend({name:z.string().trim().min(2,"Informe seu nome.").max(80,"Nome muito longo.")});
 
 function parse(formData:FormData,signup=false){const raw={name:formData.get("name"),email:formData.get("email"),password:formData.get("password")};return signup?signupSchema.safeParse(raw):loginSchema.safeParse(raw);}
+function safePath(value:FormDataEntryValue|null,fallback="/app"){const path=String(value??"");return path.startsWith("/")&&!path.startsWith("//")?path:fallback;}
 export async function login(_:AuthState|undefined,formData:FormData):Promise<AuthState>{
-  const result=parse(formData);if(!result.success)return{errors:result.error.flatten().fieldErrors};if(!hasSupabaseEnv)return{message:"Modo demonstração ativo. Use o botão “Explorar demonstração”."};
-  const supabase=await createClient();const {error}=await supabase.auth.signInWithPassword({email:result.data.email as string,password:result.data.password});if(error)return{message:"Não foi possível entrar. Confira e-mail e senha."};redirect("/app");
+  const result=parse(formData);if(!result.success)return{errors:result.error.flatten().fieldErrors};if(!hasSupabaseEnv)return{message:"Serviço de autenticação não configurado."};
+  const supabase=await createClient();const {error}=await supabase.auth.signInWithPassword({email:result.data.email as string,password:result.data.password});if(error)return{message:"Não foi possível entrar. Confira e-mail e senha."};redirect(safePath(formData.get("redirectTo")));
 }
 export async function signup(_:AuthState|undefined,formData:FormData):Promise<AuthState>{
   const result=parse(formData,true);if(!result.success)return{errors:result.error.flatten().fieldErrors};if(!hasSupabaseEnv)return{message:"Conecte um projeto Supabase para criar a conta."};
   const data=result.data as {name:string;email:string;password:string};const supabase=await createClient();const origin=process.env.NEXT_PUBLIC_SITE_URL??"http://localhost:3000";const {error}=await supabase.auth.signUp({email:data.email,password:data.password,options:{data:{full_name:data.name},emailRedirectTo:`${origin}/auth/callback?next=/onboarding`}});if(error)return{message:error.message.includes("already")?"Este e-mail já possui cadastro.":"Não foi possível criar a conta."};return{message:"Conta criada! Confira seu e-mail para continuar."};
 }
-export async function signInWithGoogle(_:AuthState|undefined,__formData:FormData):Promise<AuthState>{
-  void _;void __formData;
-  if(!hasSupabaseEnv)return{message:"Conecte um projeto Supabase para entrar com Google."};
-  const supabase=await createClient();const origin=process.env.NEXT_PUBLIC_SITE_URL??"http://localhost:3000";
-  const{data,error}=await supabase.auth.signInWithOAuth({provider:"google",options:{redirectTo:`${origin}/auth/callback?next=/onboarding`}});
-  if(error||!data.url)return{message:"Não foi possível iniciar o cadastro com Google."};
-  redirect(data.url);
-}
-export async function requestPasswordReset(_:AuthState|undefined,formData:FormData):Promise<AuthState>{const email=z.email().safeParse(formData.get("email"));if(!email.success)return{message:"Informe um e-mail válido."};if(!hasSupabaseEnv)return{message:"Conecte o Supabase para recuperar a senha."};const supabase=await createClient();const origin=process.env.NEXT_PUBLIC_SITE_URL??"http://localhost:3000";await supabase.auth.resetPasswordForEmail(email.data,{redirectTo:`${origin}/reset-password`});return{message:"Se houver uma conta, enviaremos o link de recuperação."};}
+export async function requestPasswordReset(_:AuthState|undefined,formData:FormData):Promise<AuthState>{const email=z.email().safeParse(formData.get("email"));if(!email.success)return{message:"Informe um e-mail válido."};if(!hasSupabaseEnv)return{message:"Conecte o Supabase para recuperar a senha."};const supabase=await createClient();const origin=process.env.NEXT_PUBLIC_SITE_URL??"http://localhost:3000";await supabase.auth.resetPasswordForEmail(email.data,{redirectTo:`${origin}/auth/callback?next=/reset-password`});return{message:"Se houver uma conta, enviaremos o link de recuperação."};}
+export async function updatePassword(_:AuthState|undefined,formData:FormData):Promise<AuthState>{const schema=z.object({password:z.string().min(8,"A senha deve ter pelo menos 8 caracteres.").max(128),confirmation:z.string()}).refine((value)=>value.password===value.confirmation,{path:["confirmation"],message:"As senhas não coincidem."});const result=schema.safeParse({password:formData.get("password"),confirmation:formData.get("confirmation")});if(!result.success)return{errors:result.error.flatten().fieldErrors};const supabase=await createClient();const{data}=await supabase.auth.getUser();if(!data.user)return{message:"O link expirou. Solicite uma nova recuperação."};const{error}=await supabase.auth.updateUser({password:result.data.password});if(error)return{message:"Não foi possível alterar a senha."};await supabase.auth.signOut();redirect("/login?password=updated");}
 export async function logout(){if(hasSupabaseEnv){const supabase=await createClient();await supabase.auth.signOut();}redirect("/login");}

@@ -8,6 +8,7 @@
     "start": "next start",
     "lint": "eslint",
     "test": "vitest run",
+    "test:db": "supabase test db",
     "test:watch": "vitest",
     "typecheck": "tsc --noEmit"
   },

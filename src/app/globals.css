@@ -1,6 +1,6 @@
 @import "tailwindcss";
 
-:root { --ink:#1d1930; --muted:#716b86; --paper:#f7f6fb; --surface:#fff; --line:#ded9ee; --violet:#6c4cff; --violet-dark:#4c32ca; --lavender:#eeeaff; --yellow:#ffc43d; --green:#27ae76; --red:#df5b62; --navy:#22213d; }
+:root { --ink:#1d1930; --muted:#716b86; --paper:#f7f6fb; --surface:#fff; --surface-soft:#fbfaff; --line:#ded9ee; --violet:#6c4cff; --violet-dark:#4c32ca; --lavender:#eeeaff; --yellow:#ffc43d; --green:#27ae76; --red:#df5b62; --navy:#22213d; }
 * { box-sizing: border-box; }
 html { scroll-behavior: smooth; }
 body { margin:0; color:var(--ink); background:var(--paper); font-family:var(--font-body),system-ui,sans-serif; -webkit-font-smoothing:antialiased; }
@@ -18,17 +18,76 @@ button,a { -webkit-tap-highlight-color:transparent; }
 .btn-primary:hover { transform:translateY(-1px); box-shadow:0 5px 0 var(--violet-dark); }
 .btn-primary:active { transform:translateY(3px); box-shadow:0 1px 0 var(--violet-dark); }
 .btn-primary:disabled { opacity:.55; cursor:not-allowed; transform:none; }
-.btn-secondary { display:inline-flex; align-items:center; justify-content:center; gap:.5rem; min-height:44px; padding:.65rem 1rem; border:1px solid var(--line); border-radius:13px; color:var(--ink); background:white; font-weight:800; cursor:pointer; }
-.input { width:100%; min-height:46px; border:1px solid var(--line); border-radius:12px; background:white; padding:.72rem .85rem; color:var(--ink); transition:border .15s,box-shadow .15s; }
+.btn-secondary { display:inline-flex; align-items:center; justify-content:center; gap:.5rem; min-height:44px; padding:.65rem 1rem; border:1px solid var(--line); border-radius:13px; color:var(--ink); background:var(--surface); font-weight:800; cursor:pointer; }
+.btn-secondary:disabled { opacity:.55; cursor:not-allowed; }
+.input { width:100%; min-height:46px; border:1px solid var(--line); border-radius:12px; background:var(--surface); padding:.72rem .85rem; color:var(--ink); transition:border .15s,box-shadow .15s; }
+.input.linkedin-input { padding-left:2.25rem; }
 .input:focus { border-color:var(--violet); box-shadow:0 0 0 3px rgba(108,76,255,.12); outline:none; }
 .label { display:block; margin-bottom:.38rem; font-size:.82rem; font-weight:800; color:#403a59; }
 .eyebrow { color:var(--violet); font-size:.72rem; line-height:1; font-weight:900; letter-spacing:.13em; text-transform:uppercase; }
 .chip { display:inline-flex; align-items:center; gap:.35rem; border-radius:999px; padding:.35rem .65rem; font-size:.75rem; font-weight:800; }
+.icon-button { display:grid; width:44px; height:44px; place-items:center; border:1px solid var(--line); border-radius:13px; color:var(--ink); background:var(--surface); cursor:pointer; }
+.nav-link { display:flex; align-items:center; gap:.75rem; border-radius:12px; padding:.75rem; color:var(--muted); font-size:.875rem; font-weight:800; transition:background .15s,color .15s; }
+.nav-link:hover { background:var(--surface-soft); color:var(--ink); }
+.nav-link-active { background:var(--lavender); color:#5b3ee4; }
+.app-sidebar,.mobile-nav { border-color:var(--line); background:var(--surface); }
+.app-header { border-color:var(--line); background:color-mix(in srgb,var(--paper) 90%,transparent); }
+.profile-link { display:flex; min-height:44px; align-items:center; gap:.5rem; border:1px solid var(--line); border-radius:13px; padding:.3rem .75rem .3rem .3rem; background:var(--surface); color:var(--ink); }
+.avatar { display:grid; width:34px; height:34px; place-items:center; border-radius:9px; background:var(--violet); color:white; font-size:.75rem; font-weight:900; }
+.avatar-photo { background-position:center; background-repeat:no-repeat; background-size:cover; color:transparent; }
+.mobile-link { display:flex; min-width:0; flex-direction:column; align-items:center; gap:.2rem; padding:.5rem .1rem; color:#8e879f; font-size:.58rem; font-weight:800; }
+.level-card { background:#31294e; }
+.ranking-medal { background:#fff4d3; color:#9b6200; }
+.ranking-metric { color:#795000; }
+.ranking-streak { color:var(--ink); }.ranking-streak svg { color:#e65f36; }
+.ranking-time { color:var(--ink); }.ranking-time svg { color:#19785a; }
+.ranking-current-row { background:var(--lavender); }
 .scrollbar-none { scrollbar-width:none; }.scrollbar-none::-webkit-scrollbar { display:none; }
 @keyframes bob { 0%,100%{transform:translateY(0) rotate(-2deg)}50%{transform:translateY(-7px) rotate(2deg)} }
 @keyframes pulse-ring { 0%{box-shadow:0 0 0 0 rgba(108,76,255,.24)}70%{box-shadow:0 0 0 14px rgba(108,76,255,0)}100%{box-shadow:0 0 0 0 rgba(108,76,255,0)} }
+@keyframes drive-progress { from{left:0} }
+@keyframes grow-progress { from{transform:scaleX(0)} to{transform:scaleX(1)} }
+@keyframes lego-car-bounce { 0%,100%{transform:translateY(0) rotate(0)} 35%{transform:translateY(-2px) rotate(-1deg)} 70%{transform:translateY(1px) rotate(1deg)} }
+@keyframes lego-wheel-spin { to{transform:rotate(360deg)} }
+@keyframes lego-flag-wave { 0%,100%{transform:skewY(0) rotate(0)} 50%{transform:skewY(-5deg) rotate(-2deg)} }
+.journey-track { background:#57506f; box-shadow:inset 0 2px 3px rgba(0,0,0,.22); }
+.journey-track::after { content:""; position:absolute; inset:4px 0 auto; height:2px; background:repeating-linear-gradient(90deg,rgba(255,255,255,.45) 0 13px,transparent 13px 23px); }
+.journey-racer { z-index:2; width:50px; animation:drive-progress .95s cubic-bezier(.2,.85,.35,1) both; transition:left .7s cubic-bezier(.2,.85,.35,1); }
+.journey-progress-fill { position:relative; z-index:1; background:#ffc43d; animation:grow-progress .95s cubic-bezier(.2,.85,.35,1) both; transform-origin:left center; box-shadow:inset 0 2px rgba(255,255,255,.35); }
+.lego-car { position:relative; display:block; width:50px; height:30px; filter:drop-shadow(0 4px 2px rgba(10,8,25,.38)); animation:lego-car-bounce .55s ease-in-out infinite; }
+.lego-f1-body { position:absolute; z-index:2; left:8px; bottom:7px; width:31px; height:9px; border:1px solid #7f080e; border-radius:3px 7px 2px 2px; background:#e51b23; box-shadow:inset 0 2px rgba(255,255,255,.28); }
+.lego-f1-body::before { content:""; position:absolute; left:7px; top:-4px; width:7px; height:4px; border:1px solid #7f080e; border-bottom:0; border-radius:2px 2px 0 0; background:#e51b23; }
+.lego-f1-engine-cover { position:absolute; z-index:3; left:12px; bottom:15px; width:15px; height:9px; border:1px solid #7f080e; border-radius:6px 2px 0 0; background:#e51b23; transform:skewX(-10deg); }
+.lego-f1-engine-cover::before { content:""; position:absolute; left:2px; top:-4px; width:6px; height:4px; border:1px solid #7f080e; border-bottom:0; border-radius:2px 2px 0 0; background:#e51b23; }
+.lego-f1-number { position:absolute; right:1px; top:0; color:#fff; font-size:6px; font-weight:900; line-height:8px; transform:skewX(10deg); }
+.lego-f1-cockpit { position:absolute; z-index:4; left:25px; bottom:15px; width:10px; height:7px; border:2px solid #292536; border-bottom:0; border-radius:7px 7px 1px 1px; }
+.lego-f1-driver { position:absolute; left:2px; top:-4px; width:5px; height:5px; border:1px solid #815b00; border-radius:50%; background:#ffc43d; box-shadow:0 0 0 1px #e51b23; }
+.lego-f1-nose { position:absolute; z-index:2; right:3px; bottom:9px; width:16px; height:5px; border:1px solid #7f080e; border-left:0; border-radius:0 4px 2px 0; background:#e51b23; transform:skewX(-16deg); }
+.lego-f1-front-wing { position:absolute; z-index:1; right:0; bottom:5px; width:16px; height:4px; border:1px solid #15121f; border-radius:2px; background:#282331; }
+.lego-f1-front-wing::before { content:""; position:absolute; right:1px; top:-4px; width:5px; height:4px; border:1px solid #15121f; border-bottom:0; border-radius:2px 2px 0 0; background:#282331; }
+.lego-f1-rear-wing { position:absolute; z-index:2; left:2px; bottom:14px; width:12px; height:4px; border:1px solid #15121f; border-radius:2px; background:#282331; }
+.lego-f1-rear-wing::after { content:""; position:absolute; left:2px; top:3px; width:3px; height:7px; background:#282331; }
+.lego-wheel { position:absolute; z-index:5; bottom:0; display:grid; width:12px; height:12px; place-items:center; border:3px solid #15121f; border-radius:50%; background:#403b50; animation:lego-wheel-spin .5s linear infinite; }
+.lego-wheel span { width:4px; height:4px; border-radius:1px; background:#ffc43d; }
+.lego-wheel-left { left:7px; }.lego-wheel-right { right:5px; }
+.lego-finish { z-index:3; width:35px; height:44px; }
+.lego-flag-set { position:relative; display:block; width:35px; height:44px; filter:drop-shadow(0 3px 2px rgba(10,8,25,.3)); }
+.lego-checkered-flag { position:absolute; z-index:2; right:7px; top:0; display:grid; width:27px; height:19px; grid-template-columns:repeat(4,1fr); grid-template-rows:repeat(3,1fr); overflow:hidden; border:2px solid #171522; border-left-width:1px; transform-origin:right center; animation:lego-flag-wave 1s ease-in-out infinite; }
+.lego-checkered-flag span { background:#fff; }.lego-checkered-flag span:nth-child(1),.lego-checkered-flag span:nth-child(3),.lego-checkered-flag span:nth-child(6),.lego-checkered-flag span:nth-child(8),.lego-checkered-flag span:nth-child(9),.lego-checkered-flag span:nth-child(11) { background:#171522; }
+.lego-flag-pole { position:absolute; z-index:1; right:4px; top:1px; width:4px; height:36px; border:1px solid #756b86; border-radius:2px; background:#ded9ee; }
+.lego-flag-base { position:absolute; right:0; bottom:0; width:17px; height:8px; border:1px solid #31294e; border-radius:2px; background:#6c4cff; box-shadow:inset 0 2px rgba(255,255,255,.28); }
+.lego-flag-base span { position:absolute; left:4px; top:-4px; width:7px; height:4px; border:1px solid #31294e; border-bottom:0; border-radius:2px 2px 0 0; background:#6c4cff; }
 .animate-bob { animation:bob 3.6s ease-in-out infinite; }.pulse-ring { animation:pulse-ring 2s infinite; }
 @media (prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;scroll-behavior:auto!important;transition-duration:.01ms!important}}
-html.dark { --ink:#f5f2ff; --muted:#aaa4bd; --paper:#151424; --surface:#201e32; --line:#39364e; --navy:#eeebff; }
+html.dark { --ink:#f5f2ff; --muted:#b7b1c9; --paper:#151424; --surface:#201e32; --surface-soft:#29263e; --line:#403c55; --navy:#eeebff; --lavender:#302a52; }
 html.dark .input,html.dark .btn-secondary { background:#29263e; color:var(--ink); }
 html.dark .label { color:#d4cfe4; }
+html.dark [class~="bg-white"],html.dark [class~="bg-[#fbfaff]"],html.dark [class~="bg-[#f7f6fb]"] { background:var(--surface)!important; }
+html.dark [class~="text-[#1d1930]"] { color:var(--ink)!important; }
+html.dark [class~="text-[#716b86]"],html.dark [class~="text-[#8e879f]"],html.dark [class~="text-[#aaa4bd]"] { color:var(--muted)!important; }
+html.dark [class~="border-[#ded9ee]"],html.dark [class~="border-[#ece9f2]"],html.dark [class~="border-[#e8e4f0]"] { border-color:var(--line)!important; }
+html.dark .nav-link-active { color:#c7bbff; }
+html.dark .ranking-medal { background:#44391f; color:#ffd66b; }
+html.dark .ranking-metric { color:#ffd66b; }
+html.dark .ranking-streak svg { color:#ff9a76; }
+html.dark .ranking-time svg { color:#65d7ad; }
