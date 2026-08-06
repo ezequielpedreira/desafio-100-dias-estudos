@@ -5,22 +5,23 @@ export const runtime = "nodejs";
 
 const WINDOW_MS = 10 * 60 * 1000;
 const MAX_SUBMISSIONS = 3;
-const recentSubmissions = new Map<string, number[]>();
+const recentSubmissions = new Map<string, Map<string, number>>();
 
-function isRateLimited(userId: string) {
+function isRateLimited(userId: string, requestId: string) {
   const now = Date.now();
-  const recent = (recentSubmissions.get(userId) ?? []).filter(
-    (timestamp) => now - timestamp < WINDOW_MS,
+  const recent = new Map(
+    [...(recentSubmissions.get(userId) ?? new Map())].filter(
+      ([, timestamp]) => now - timestamp < WINDOW_MS,
+    ),
   );
   recentSubmissions.set(userId, recent);
-  return recent.length >= MAX_SUBMISSIONS;
+  return !recent.has(requestId) && recent.size >= MAX_SUBMISSIONS;
 }
 
-function recordSubmission(userId: string) {
-  recentSubmissions.set(userId, [
-    ...(recentSubmissions.get(userId) ?? []),
-    Date.now(),
-  ]);
+function recordSubmission(userId: string, requestId: string) {
+  const recent = recentSubmissions.get(userId) ?? new Map<string, number>();
+  recent.set(requestId, Date.now());
+  recentSubmissions.set(userId, recent);
 }
 
 function json(message: string, status: number) {
@@ -59,9 +60,26 @@ export async function POST(request: Request) {
       return json("Entre novamente para enviar seu feedback.", 401);
     }
 
-    if (isRateLimited(data.user.id)) {
+    if (isRateLimited(data.user.id, parsed.data.requestId)) {
       return json("Você já enviou alguns feedbacks. Aguarde alguns minutos para enviar outro.", 429);
     }
+
+    const { error: storageError } = await supabase.from("feedback_submissions").insert({
+      user_id: data.user.id,
+      request_id: parsed.data.requestId,
+      category: parsed.data.category,
+      message: parsed.data.message,
+      rating: parsed.data.rating,
+      source: parsed.data.source,
+    });
+    const isDuplicate = storageError?.code === "23505";
+    if (storageError && !isDuplicate) {
+      console.error("Falha ao armazenar feedback no Supabase.", {
+        code: storageError.code,
+      });
+      return json("Não foi possível salvar seu feedback agora. Tente novamente.", 503);
+    }
+    if (!isDuplicate) recordSubmission(data.user.id, parsed.data.requestId);
 
     const apiKey = process.env.RESEND_API_KEY?.trim();
     const to = process.env.FEEDBACK_TO_EMAIL?.trim();
@@ -71,7 +89,7 @@ export async function POST(request: Request) {
         hasApiKey: Boolean(apiKey),
         hasRecipient: Boolean(to),
       });
-      return json("O canal de feedback está temporariamente indisponível.", 503);
+      return json("Feedback salvo. O aviso por e-mail está temporariamente indisponível.", 202);
     }
 
     const name =
@@ -83,6 +101,7 @@ export async function POST(request: Request) {
       headers: {
         Authorization: `Bearer ${apiKey}`,
         "Content-Type": "application/json",
+        "Idempotency-Key": `feedback/${data.user.id}/${parsed.data.requestId}`,
       },
       body: JSON.stringify({
         from,
@@ -100,11 +119,10 @@ export async function POST(request: Request) {
       console.error("Falha no envio de feedback pelo Resend.", {
         status: resendResponse.status,
       });
-      return json("Não foi possível enviar agora. Tente novamente em alguns instantes.", 502);
+      return json("Feedback salvo, mas não foi possível enviar o aviso por e-mail agora.", 502);
     }
 
-    recordSubmission(data.user.id);
-    return json("Feedback enviado. Obrigado por ajudar a melhorar a jornada!", 200);
+    return json("Feedback salvo e enviado. Obrigado por ajudar a melhorar a jornada!", 200);
   } catch (error) {
     console.error("Falha inesperada no envio de feedback.", {
       name: error instanceof Error ? error.name : "UnknownError",

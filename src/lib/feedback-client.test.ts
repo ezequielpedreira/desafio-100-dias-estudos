@@ -2,6 +2,7 @@ import { describe, expect, it, vi } from "vitest";
 import { sendFeedbackRequest } from "./feedback-client";
 
 const payload = {
+  requestId: "550e8400-e29b-41d4-a716-446655440000",
   category: "problem" as const,
   message: "O formulário precisa continuar aberto quando o envio falhar.",
   rating: 3,
