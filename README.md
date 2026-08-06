@@ -40,6 +40,9 @@ Abra `http://localhost:3000`.
 ```env
 NEXT_PUBLIC_SUPABASE_URL=https://SEU-PROJETO.supabase.co
 NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=sb_publishable_...
+RESEND_API_KEY=re_...
+RESEND_FROM_EMAIL="LevelUp 100 <onboarding@resend.dev>"
+FEEDBACK_TO_EMAIL=voce@exemplo.com
 NEXT_PUBLIC_SITE_URL=http://localhost:3000
 ```
 
