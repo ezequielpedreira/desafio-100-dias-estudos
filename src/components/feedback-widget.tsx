@@ -2,11 +2,15 @@
 
 import { FormEvent, useEffect, useRef, useState } from "react";
 import { LoaderCircle, MessageSquarePlus, Send, Star, X } from "lucide-react";
+import { sendFeedbackRequest } from "@/lib/feedback-client";
+import type { FeedbackInput } from "@/lib/feedback";
 
 type FeedbackStatus = { kind: "error" | "success"; message: string } | null;
 
 export function FeedbackWidget() {
   const [open, setOpen] = useState(false);
+  const [category, setCategory] = useState<FeedbackInput["category"]>("suggestion");
+  const [message, setMessage] = useState("");
   const [rating, setRating] = useState<number | null>(null);
   const [pending, setPending] = useState(false);
   const [status, setStatus] = useState<FeedbackStatus>(null);
@@ -55,33 +59,26 @@ export function FeedbackWidget() {
     setPending(true);
     setStatus(null);
 
-    const form = event.currentTarget;
-    const formData = new FormData(form);
     try {
-      const response = await fetch("/api/feedback", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          category: formData.get("category"),
-          message: formData.get("message"),
-          rating,
-          source: window.location.pathname,
-        }),
+      const result = await sendFeedbackRequest({
+        category,
+        message,
+        rating,
+        source: window.location.pathname,
       });
-      const result = (await response.json().catch(() => null)) as { message?: string } | null;
-      const message = result?.message || "Não foi possível concluir o envio.";
-      if (!response.ok) {
-        setStatus({ kind: "error", message });
-        return;
+      setStatus({ kind: result.ok ? "success" : "error", message: result.message });
+      if (result.ok) {
+        // React 19 intercepta resets de formulário. Manter os campos controlados
+        // evita que a limpeza após o sucesso alcance o error boundary da página.
+        setCategory("suggestion");
+        setMessage("");
+        setRating(null);
       }
-
-      setStatus({ kind: "success", message });
-      form.reset();
-      setRating(null);
     } catch {
+      // Defesa adicional: falhas do canal de feedback nunca devem derrubar a jornada.
       setStatus({
         kind: "error",
-        message: "Sem conexão com o serviço de feedback. Verifique sua internet e tente novamente.",
+        message: "Não foi possível concluir o envio. Tente novamente.",
       });
     } finally {
       setPending(false);
@@ -131,10 +128,10 @@ export function FeedbackWidget() {
               </button>
             </div>
 
-            <form className="mt-6 space-y-5" onSubmit={submitFeedback}>
+            <form className="mt-6 space-y-5" onSubmit={submitFeedback} aria-busy={pending}>
               <div>
                 <label className="label" htmlFor="feedback-category">Tipo de feedback</label>
-                <select className="input" id="feedback-category" name="category" defaultValue="suggestion" required>
+                <select className="input" id="feedback-category" name="category" value={category} onChange={(event) => setCategory(event.target.value as FeedbackInput["category"])} required disabled={pending}>
                   <option value="suggestion">Sugestão</option>
                   <option value="problem">Encontrei um problema</option>
                   <option value="compliment">Elogio</option>
@@ -167,10 +164,13 @@ export function FeedbackWidget() {
                   className="input min-h-32 resize-y"
                   id="feedback-message"
                   name="message"
+                  value={message}
+                  onChange={(event) => setMessage(event.target.value)}
                   minLength={10}
                   maxLength={2000}
                   placeholder="Descreva sua ideia, dificuldade ou experiência..."
                   required
+                  disabled={pending}
                 />
                 <p className="mt-1 text-xs text-[var(--muted)]">O e-mail da sua conta será usado somente para responder ao feedback.</p>
               </div>
