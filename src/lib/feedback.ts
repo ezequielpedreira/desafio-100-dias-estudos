@@ -8,6 +8,7 @@ export const feedbackCategories = {
 } as const;
 
 export const feedbackSchema = z.object({
+  requestId: z.uuid(),
   category: z.enum(["suggestion", "problem", "compliment", "other"]),
   message: z.string().trim().min(10).max(2000),
   rating: z.number().int().min(1).max(5).nullable(),

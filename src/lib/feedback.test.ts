@@ -3,6 +3,7 @@ import { buildFeedbackEmail, feedbackSchema } from "./feedback";
 
 describe("feedback", () => {
   const validFeedback = {
+    requestId: "550e8400-e29b-41d4-a716-446655440000",
     category: "suggestion" as const,
     message: "Gostei muito e tenho uma sugestão para a jornada.",
     rating: 5,

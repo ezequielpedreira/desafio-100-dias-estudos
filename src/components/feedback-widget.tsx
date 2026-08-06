@@ -18,6 +18,7 @@ export function FeedbackWidget() {
   const dialogRef = useRef<HTMLElement>(null);
   const triggerRef = useRef<HTMLButtonElement>(null);
   const pendingRef = useRef(false);
+  const requestIdRef = useRef<string | null>(null);
 
   useEffect(() => {
     pendingRef.current = pending;
@@ -58,9 +59,12 @@ export function FeedbackWidget() {
     if (pending) return;
     setPending(true);
     setStatus(null);
+    const requestId = requestIdRef.current ?? crypto.randomUUID();
+    requestIdRef.current = requestId;
 
     try {
       const result = await sendFeedbackRequest({
+        requestId,
         category,
         message,
         rating,
@@ -73,6 +77,7 @@ export function FeedbackWidget() {
         setCategory("suggestion");
         setMessage("");
         setRating(null);
+        requestIdRef.current = null;
       }
     } catch {
       // Defesa adicional: falhas do canal de feedback nunca devem derrubar a jornada.
@@ -131,7 +136,7 @@ export function FeedbackWidget() {
             <form className="mt-6 space-y-5" onSubmit={submitFeedback} aria-busy={pending}>
               <div>
                 <label className="label" htmlFor="feedback-category">Tipo de feedback</label>
-                <select className="input" id="feedback-category" name="category" value={category} onChange={(event) => setCategory(event.target.value as FeedbackInput["category"])} required disabled={pending}>
+                <select className="input" id="feedback-category" name="category" value={category} onChange={(event) => { setCategory(event.target.value as FeedbackInput["category"]); requestIdRef.current = null; }} required disabled={pending}>
                   <option value="suggestion">Sugestão</option>
                   <option value="problem">Encontrei um problema</option>
                   <option value="compliment">Elogio</option>
@@ -147,7 +152,7 @@ export function FeedbackWidget() {
                       key={value}
                       type="button"
                       className={`grid h-11 w-11 place-items-center rounded-xl border transition ${rating && value <= rating ? "border-[#ffc43d] bg-[#fff4d3] text-[#9b6200]" : "border-[var(--line)] bg-[var(--surface)] text-[var(--muted)]"}`}
-                      onClick={() => setRating(value)}
+                      onClick={() => { setRating(value); requestIdRef.current = null; }}
                       aria-label={`${value} ${value === 1 ? "estrela" : "estrelas"}`}
                       aria-pressed={rating === value}
                     >
@@ -165,7 +170,7 @@ export function FeedbackWidget() {
                   id="feedback-message"
                   name="message"
                   value={message}
-                  onChange={(event) => setMessage(event.target.value)}
+                  onChange={(event) => { setMessage(event.target.value); requestIdRef.current = null; }}
                   minLength={10}
                   maxLength={2000}
                   placeholder="Descreva sua ideia, dificuldade ou experiência..."
