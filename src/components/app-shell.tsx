@@ -5,6 +5,7 @@ import { usePathname } from "next/navigation";
 import { Award, Flame, Home, LogOut, Map, Medal, Settings, TimerReset, Trophy } from "lucide-react";
 import { BrandMark } from "./brand-mark";
 import { ThemeToggle } from "./theme-toggle";
+import { FeedbackWidget } from "./feedback-widget";
 import { cn } from "@/lib/utils";
 import { logout } from "@/app/actions/auth";
 
@@ -91,6 +92,7 @@ export function AppShell({ children, viewer }: { children: React.ReactNode; view
           return <Link key={item.href} href={item.href} prefetch={true} aria-current={active ? "page" : undefined} className={cn("mobile-link", active && "text-[#6c4cff]")}><Icon size={19} />{item.label.replace("Minha ", "")}</Link>;
         })}
       </nav>
+      <FeedbackWidget />
     </div>
   );
 }
